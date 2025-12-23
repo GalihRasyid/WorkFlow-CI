@@ -1,0 +1,12 @@
+name: diabetes_env
+channels:
+  - defaults
+dependencies:
+  - python=3.9
+  - scikit-learn
+  - pandas
+  - pip
+  - pip:
+    - mlflow
+    - dagshub
+    - joblib

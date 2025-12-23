@@ -1,0 +1,7 @@
+name: Diabetes_Prediction_Galih
+
+conda_env: conda.yaml
+
+entry_points:
+  main:
+    command: "python modelling.py"
