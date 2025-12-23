@@ -15,31 +15,27 @@ jobs:
       with:
         python-version: '3.9'
 
-    # 1. Install Dependencies
-    # Kita install library yang dibutuhkan di lingkungan runner
     - name: Install Dependencies
       run: |
         pip install mlflow dagshub pandas scikit-learn joblib prometheus-client
 
-    # 2. Run Training dengan MLflow Run (Sesuai Permintaan Reviewer)
-    - name: Run Training with MLflow
-      # --- BAGIAN PENTING: OPER TOKEN DARI SECRETS KE ENV ---
+    - name: Run Training with MLflow Run
       env:
+        # Masukkan Token & Config di Environment Variable
         DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
         MLFLOW_TRACKING_USERNAME: GalihRasyid
         MLFLOW_TRACKING_PASSWORD: ${{ secrets.DAGSHUB_TOKEN }}
-      # ------------------------------------------------------
+        # PENTING: Set URI di sini agar mlflow run tahu tujuannya
+        MLFLOW_TRACKING_URI: https://dagshub.com/GalihRasyid/submission_diabetes_GalihRasyid.mlflow
       run: |
-        # Masuk ke folder MLProject jika ada
         if [ -d "MLProject" ]; then
           cd MLProject
         fi
         
-        # Jalankan perintah mlflow run
-        # --env-manager=local artinya pakai python yang sudah kita install di atas
-        mlflow run . --env-manager=local
+        # Jalankan mlflow run
+        # Tambahkan --experiment-name agar run dibuat di tempat yang benar
+        mlflow run . --env-manager=local --experiment-name Diabetes_Fix_Artifacts
 
-    # 3. Upload Artifact Model
     - name: Upload Model Artifact
       uses: actions/upload-artifact@v4
       with:
