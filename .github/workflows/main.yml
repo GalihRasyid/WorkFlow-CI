@@ -7,45 +7,42 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. Checkout kode
     - name: Checkout code
       uses: actions/checkout@v3
 
-    # 2. Setup Python
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.9'
 
-    # 3. Install Library
-    - name: Install dependencies
+    # 1. Install Dependencies
+    # Kita install library yang dibutuhkan di lingkungan runner
+    - name: Install Dependencies
       run: |
-        pip install pandas scikit-learn mlflow dagshub joblib prometheus-client
+        pip install mlflow dagshub pandas scikit-learn joblib prometheus-client
 
-    # 4. CEK STRUKTUR FOLDER (Untuk Debugging di Log GitHub)
-    - name: Check Directory Structure
-      run: ls -R
-
-    # 5. Run Training (Dengan Logika Pintar)
-    # Script ini akan mencoba masuk ke folder 'MLProject' dulu.
-    # Jika tidak ada, dia anggap file modelling.py ada di halaman depan (root).
-    - name: Run Training
+    # 2. Run Training dengan MLflow Run (Sesuai Permintaan Reviewer)
+    - name: Run Training with MLflow
+      # --- BAGIAN PENTING: OPER TOKEN DARI SECRETS KE ENV ---
+      env:
+        DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+        MLFLOW_TRACKING_USERNAME: GalihRasyid
+        MLFLOW_TRACKING_PASSWORD: ${{ secrets.DAGSHUB_TOKEN }}
+      # ------------------------------------------------------
       run: |
+        # Masuk ke folder MLProject jika ada
         if [ -d "MLProject" ]; then
-          echo "Masuk ke folder MLProject..."
           cd MLProject
-        else
-          echo "Folder MLProject tidak ditemukan, menjalankan di root..."
         fi
         
-        # Jalankan script modelling
-        python modelling.py
+        # Jalankan perintah mlflow run
+        # --env-manager=local artinya pakai python yang sudah kita install di atas
+        mlflow run . --env-manager=local
 
-    # 6. Upload Artifact Model (Menyesuaikan lokasi file)
+    # 3. Upload Artifact Model
     - name: Upload Model Artifact
       uses: actions/upload-artifact@v4
       with:
         name: model-artifact
-        # Path ini mencari file .pkl dimanapun dia berada (wildcard)
-        path: '**/*.pkl'
+        path: '**/model.pkl'
         retention-days: 5
