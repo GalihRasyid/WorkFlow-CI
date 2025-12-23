@@ -1,0 +1,51 @@
+name: CI/CD Pipeline Diabetes
+
+on: [push]
+
+jobs:
+  build-and-train:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Checkout kode
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # 2. Setup Python
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    # 3. Install Library
+    - name: Install dependencies
+      run: |
+        pip install pandas scikit-learn mlflow dagshub joblib prometheus-client
+
+    # 4. CEK STRUKTUR FOLDER (Untuk Debugging di Log GitHub)
+    - name: Check Directory Structure
+      run: ls -R
+
+    # 5. Run Training (Dengan Logika Pintar)
+    # Script ini akan mencoba masuk ke folder 'MLProject' dulu.
+    # Jika tidak ada, dia anggap file modelling.py ada di halaman depan (root).
+    - name: Run Training
+      run: |
+        if [ -d "MLProject" ]; then
+          echo "Masuk ke folder MLProject..."
+          cd MLProject
+        else
+          echo "Folder MLProject tidak ditemukan, menjalankan di root..."
+        fi
+        
+        # Jalankan script modelling
+        python modelling.py
+
+    # 6. Upload Artifact Model (Menyesuaikan lokasi file)
+    - name: Upload Model Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: model-artifact
+        # Path ini mencari file .pkl dimanapun dia berada (wildcard)
+        path: '**/*.pkl'
+        retention-days: 5
