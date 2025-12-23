@@ -11,9 +11,12 @@ from dagshub.auth import add_app_token
 
 # --- 1. SETUP AUTHENTICATION ---
 # Catatan: Idealnya token disimpan di GitHub Secrets, tapi untuk sekarang hardcode tidak apa-apa agar jalan.
-TOKEN_ASLI = "d1f669853cea910190197feb84d64f7cb5691026" 
+TOKEN_ASLI = os.environ.get("DAGSHUB_TOKEN")
 
-os.environ["MLFLOW_TRACKING_USERNAME"] = "GalihRasyid"
+if not TOKEN_ASLI:
+    raise ValueError("Token DagsHub tidak ditemukan! Pastikan sudah diset di Secrets.")
+
+os.environ["MLFLOW_TRACKING_USERNAME"] = "GalihRasyid" # Ganti username Anda
 os.environ["MLFLOW_TRACKING_PASSWORD"] = TOKEN_ASLI
 os.environ["DAGSHUB_USER_TOKEN"] = TOKEN_ASLI
 

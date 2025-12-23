@@ -1,12 +1,13 @@
-name: diabetes_env
+name: diabetes-env
 channels:
-  - defaults
+  - conda-forge
 dependencies:
   - python=3.9
-  - scikit-learn
-  - pandas
   - pip
   - pip:
-    - mlflow
-    - dagshub
-    - joblib
+      - pandas
+      - scikit-learn
+      - mlflow
+      - dagshub
+      - joblib
+      - prometheus-client
